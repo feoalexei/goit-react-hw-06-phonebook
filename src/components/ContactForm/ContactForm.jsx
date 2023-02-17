@@ -2,10 +2,13 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '../Box';
 import { StyledContactForm, AddBtn } from './ContactForm.styled';
+import { useSelector } from 'react-redux';
+import { selectContacts } from 'redux/contacts/contacts-selector';
 
 const ContactForm = ({ addContact }) => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const contactList = useSelector(selectContacts);
 
   const changeHandler = ({ target }) => {
     const { name, value } = target;

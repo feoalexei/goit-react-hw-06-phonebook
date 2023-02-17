@@ -19,16 +19,6 @@ export const App = () => {
   );
   const [filter, setFilter] = useState('');
 
-  // Alternative way to load items from Local Storage on start
-  // useEffect(() => {
-  //   const contacts = localStorage.getItem(CONTACTS_KEY);
-  //   const parsedContacts = JSON.parse(contacts);
-
-  //   if (parsedContacts?.length) {
-  //     setContacts(parsedContacts);
-  //   }
-  // }, []);
-
   useEffect(() => {
     localStorage.setItem(CONTACTS_KEY, JSON.stringify(contacts));
   }, [contacts]);
