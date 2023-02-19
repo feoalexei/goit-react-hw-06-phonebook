@@ -1,37 +1,51 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Box } from '../Box';
 import { StyledContactForm, AddBtn } from './ContactForm.styled';
-import { useSelector } from 'react-redux';
+import { nanoid } from '@reduxjs/toolkit';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectContacts } from 'redux/contacts/contacts-selector';
+import { addContactAction } from 'redux/contacts/contacts-slice';
 
-const ContactForm = ({ addContact }) => {
+const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const contactList = useSelector(selectContacts);
+  const contacts = useSelector(selectContacts);
+  const dispatch = useDispatch();
 
-  const changeHandler = ({ target }) => {
+  const handleChange = ({ target }) => {
     const { name, value } = target;
     if (name === 'name') setName(value);
     if (name === 'number') setNumber(value);
   };
 
-  const submitHandler = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    addContact({ name, number });
+    const newContact = {
+      id: nanoid(),
+      name,
+      number,
+    };
+
+    const nameAlreadyExists = contacts.find(
+      contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
+    );
+
+    if (nameAlreadyExists) return alert(`${name} is already in contacts`);
+
+    dispatch(addContactAction(newContact));
     setName('');
     setNumber('');
   };
 
   return (
-    <StyledContactForm onSubmit={submitHandler}>
+    <StyledContactForm onSubmit={handleSubmit}>
       <Box my={4} display="flex" justifyContent="space-between">
         <label>
           Name:
           <input
             type="text"
             name="name"
-            onChange={changeHandler}
+            onChange={handleChange}
             value={name}
             pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
@@ -44,7 +58,7 @@ const ContactForm = ({ addContact }) => {
           <input
             type="tel"
             name="number"
-            onChange={changeHandler}
+            onChange={handleChange}
             value={number}
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
@@ -55,10 +69,6 @@ const ContactForm = ({ addContact }) => {
       <AddBtn>Add contact</AddBtn>
     </StyledContactForm>
   );
-};
-
-ContactForm.propTypes = {
-  addContact: PropTypes.func,
 };
 
 export default ContactForm;
